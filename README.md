@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.com/acse-2019/acse-4-armageddon-gaspra.svg?token=LLWPcyz5SyJK6wRvCsFH&branch=master)](https://travis-ci.com/acse-2019/acse-4-armageddon-gaspra)
 
-
-# ACSE-4-armageddon
+# Armageddon
 
 Asteroids entering Earth’s atmosphere are subject to extreme drag forces that decelerate, heat and disrupt the space rocks. The fate of an asteroid is a complex function of its initial mass, speed, trajectory angle and internal strength. 
 
