@@ -14,7 +14,7 @@ This tool predicts the fate of asteroids entering Earth’s atmosphere for the p
 To install the project, simply run pip on a virtual machine that has Git installed on it:
 
 ```
-pip install git+git@github.com:acse-2019/acse-4-armageddon-gaspra.git
+pip install git+git@github.com:vagifaliyev/Meteor-Dynamics-Chelyabinsk
 ```
 
 ### User instructions
@@ -39,8 +39,6 @@ There are two ways to determine all the desired outputs, which are using :
 
 ##### Example Usage
 
-
-
 ```
 import armageddon
 
@@ -58,9 +56,9 @@ print(outcome)
 earth.plot_analysis(result)
 ```
 
-![alt text](https://github.com/acse-2019/acse-4-armageddon-gaspra/blob/karim/images/example_1.png)
+![alt text](https://github.com/vagifaliyev/Meteor-Dynamics-Chelyabinsk/blob/master/images/example_1.png)
 
-![alt text](https://github.com/acse-2019/acse-4-armageddon-gaspra/blob/karim/images/example_2.png)
+![alt text](https://github.com/vagifaliyev/Meteor-Dynamics-Chelyabinsk/blob/master/images/example_2.png)
 
 
 #### Ensemble
