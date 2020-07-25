@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="0" failures="0" hostname="dyn3156-23.wlan.ic.ac.uk" name="pytest" skipped="0" tests="6" time="57.781" timestamp="2019-12-13T11:41:14.111939"><testcase classname="armageddon.test.test_armageddon" file="armageddon/test/test_armageddon.py" line="41" name="test_import" time="0.002"></testcase><testcase classname="armageddon.test.test_armageddon" file="armageddon/test/test_armageddon.py" line="59" name="test_attributes" time="0.001"></testcase><testcase classname="armageddon.test.test_armageddon" file="armageddon/test/test_armageddon.py" line="65" name="test_solve_atmospheric_entry" time="0.005"></testcase><testcase classname="armageddon.test.test_armageddon" file="armageddon/test/test_armageddon.py" line="84" name="test_calculate_energy" time="0.018"><system-out>        velocity          mass   angle  ...  radius  time           dedz
+0  100000.000000  1.256637e+04  30.000  ...     1.0  0.00       0.000000
+1  241069.663428 -1.454567e+08  29.993  ...     1.0  0.05  181462.017063
+2  382139.326857 -2.909259e+08  29.986  ...     1.0  0.10  730522.915342
+
+[3 rows x 8 columns]
+</system-out></testcase><testcase classname="armageddon.test.test_armageddon" file="armageddon/test/test_armageddon.py" line="96" name="test_analyse_outcome" time="0.003"></testcase><testcase classname="armageddon.test.test_armageddon" file="armageddon/test/test_armageddon.py" line="103" name="test_ensemble" time="52.152"></testcase></testsuite></testsuites>

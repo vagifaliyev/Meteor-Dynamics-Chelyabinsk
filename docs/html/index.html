@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Project 2: Armageddon - Atmospheric entry and disruption of asteroids &#8212; Armageddon  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="project-2-armageddon-atmospheric-entry-and-disruption-of-asteroids">
+<h1>Project 2: Armageddon - Atmospheric entry and disruption of asteroids<a class="headerlink" href="#project-2-armageddon-atmospheric-entry-and-disruption-of-asteroids" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis:<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>Asteroids entering Earth’s atmosphere are subject to extreme drag forces
+that decelerate, heat and disrupt the space rocks. The fate of an
+asteroid is a complex function of its initial mass, speed, trajectory
+angle and internal strength.</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Asteroid">Asteroids</a> 10-100 m in
+diameter can penetrate deep into Earth’s atmosphere and disrupt
+catastrophically, generating an atmospheric disturbance
+(<a class="reference external" href="https://en.wikipedia.org/wiki/Air_burst">airburst</a>) that can cause
+<a class="reference external" href="https://www.youtube.com/watch?v=tq02C_3FvFo">damage on the ground</a>.
+Such an event occurred over the city of
+<a class="reference external" href="https://en.wikipedia.org/wiki/Chelyabinsk_meteor">Chelyabinsk</a> in
+Russia, in 2013, releasing energy equivalent to about 520 <a class="reference external" href="https://en.wikipedia.org/wiki/TNT_equivalent">kilotons of
+TNT</a> (1 kt TNT is
+equivalent to <span class="math notranslate nohighlight">\(4.184 \times 10^{12}\)</span> J), and injuring thousands of
+people (<a class="reference external" href="http://doi.org/10.1126/science.1242642">Popova et al.,
+2013</a>; <a class="reference external" href="http://doi.org/10.1038/nature12741">Brown et al.,
+2013</a>). An even larger event
+occurred over
+<a class="reference external" href="https://en.wikipedia.org/wiki/Tunguska_event">Tunguska</a>, an
+unpopulated area in Siberia, in 1908.</p>
+<p>The purpose of this exercise is to develop a fast numerical simulator to
+predict the fate of asteroids entering Earth’s atmosphere for the
+purposes of hazard assessment.</p>
+</div>
+<div class="section" id="problem-definition">
+<h2>Problem definition<a class="headerlink" href="#problem-definition" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="equations">
+<h3>Equations<a class="headerlink" href="#equations" title="Permalink to this headline">¶</a></h3>
+<p>The dynamics of an asteroid in Earth’s atmosphere is
+governed by a coupled set of ordinary differential equations:</p>
+<div class="math notranslate nohighlight" id="equation-index-0">
+\begin{aligned}
+\frac{dv}{dt} &amp; = \frac{-C_D\rho_a A v^2}{2 m} + g \sin \theta \\
+\frac{dm}{dt} &amp; = \frac{-C_H\rho_a A v^3}{2 Q} \\
+\frac{d\theta}{dt} &amp; = \frac{g\cos\theta}{v} - \frac{C_L\rho_a A v}{2 m} - \frac{v\cos\theta}{R_P + z} \\
+\frac{dz}{dt} &amp; = -v\sin\theta \\
+\frac{dx}{dt} &amp; = \frac{v\cos\theta}{1 + z/R_P}
+\end{aligned}</div><p>In these equations, <span class="math notranslate nohighlight">\(v\)</span>, <span class="math notranslate nohighlight">\(m\)</span>, and <span class="math notranslate nohighlight">\(A\)</span> are the asteroid
+speed (along trajectory), mass and cross-sectional area, respectively.
+<span class="math notranslate nohighlight">\(\theta\)</span> is the meteoroid trajectory angle to the horizontal (in radians), <span class="math notranslate nohighlight">\(x\)</span> is the
+downrange distance of the meteoroid from its entry position, <span class="math notranslate nohighlight">\(z\)</span>
+is the altitude and <span class="math notranslate nohighlight">\(t\)</span> is time; <span class="math notranslate nohighlight">\(C_D\)</span> is the drag
+coefficient, <span class="math notranslate nohighlight">\(\rho_a\)</span> is the atmospheric density (a function of
+altitude ), <span class="math notranslate nohighlight">\(C_H\)</span> is an ablation efficiency coefficient, <span class="math notranslate nohighlight">\(Q\)</span>
+is the specific heat of ablation; <span class="math notranslate nohighlight">\(C_L\)</span> is a lift coefficient; and
+<span class="math notranslate nohighlight">\(R_P\)</span> is the planetary radius. All terms use MKS units.</p>
+<p>It is common to assume (for simplicity) that, prior to break-up, the
+radius (and cross-sectional area) of the asteroid remains constant;
+that is, any mass-loss by <strong>ablation</strong> does not change the
+cross-sectional area of the asteroid. We will further assume a spherical asteroid.</p>
+<p>A commonly used criterion for the break-up of an asteroid in the
+atmosphere is when the ram pressure of the air interacting with the
+asteroid <span class="math notranslate nohighlight">\(\rho_a v^2\)</span> first exceeds the strength of the asteroid
+<span class="math notranslate nohighlight">\(Y\)</span>.</p>
+<div class="math notranslate nohighlight" id="equation-index-1">
+<span class="eqno">(2)<a class="headerlink" href="#equation-index-1" title="Permalink to this equation">¶</a></span>\[\rho_a v^2 = Y\]</div>
+<p>Should break-up occur, the asteroid deforms and spreads laterally as
+it continues its passage through the atmosphere. As a result its
+radius and cross-sectional area increase, but the asteroid density is
+assumed to remain constant (often referred to as ‘pancaking’).  It is
+conventional to define the cross-sectional area of the expanding cloud
+of fragments as <span class="math notranslate nohighlight">\(A = \pi r^2\)</span> (i.e., assuming a circular
+cross-section), for use in the above equations.</p>
+<p>Several models for the spreading rate <span class="math notranslate nohighlight">\(\frac{dr}{dt}\)</span> have been proposed. In the
+simplest model, the fragmented asteroid’s spreading rate is related to
+its along trajectory speed <a class="reference external" href="http://doi.org/10.1086/116499">(Hills and Goda, 1993)</a>:</p>
+<div class="math notranslate nohighlight" id="equation-index-2">
+<span class="eqno">(3)<a class="headerlink" href="#equation-index-2" title="Permalink to this equation">¶</a></span>\[\frac{dr}{dt} = \left[\frac{7}{2}\alpha\frac{\rho_a}{\rho_m}\right]^{1/2} v\]</div>
+<p>Where <span class="math notranslate nohighlight">\(r\)</span> is the asteroid radius, <span class="math notranslate nohighlight">\(\rho_m\)</span> is the asteroid
+density and <span class="math notranslate nohighlight">\(\alpha\)</span> is a spreading coefficient, often taken to be
+0.3.</p>
+<p>Note that fragmentation and spreading <strong>ceases</strong> (<span class="math notranslate nohighlight">\(\frac{dr}{dt}
+= 0\)</span>) when the ram pressure drops back below the strength of the
+asteroid <span class="math notranslate nohighlight">\(\rho_a v^2 &lt; Y\)</span>.</p>
+<p>The figure below shows a typical solution to the above set of equations
+for an impact airburst scenario. The kinetic energy loss per unit
+height, which is a good approximation for the energy transferred to the
+atmosphere as heat (and is often referred to as the energy deposited per
+km altitude), is shown as a function of altitude.</p>
+<img alt="_images/airburst.png" src="_images/airburst.png" />
+<p>In this scenario the asteroid experiences breakup at approximately 48-km altitude (denoted by the star), before spreading and decelerating rapidly until an altitude of approximately 15 km at which point the <strong>energy loss per unit height</strong> is <strong>maximum</strong>. This point is often considered to be the <strong>burst altitude</strong>. The total kinetic energy lost by the asteroid at this point is a good estimate of the airburst energy (i.e., the total energy deposited into the atmosphere) for hazard analysis.</p>
+<p>Impact scenarios with a burst altitude well (&gt;5 km) above the surface can be considered to be <strong>airburst events</strong> and are unlikely to form a sizable crater on the ground. In such cases, even if a substantial fraction of the original asteroid survives to the ground it will be decelerated to a very small fraction of its initial speed.</p>
+<p>Impact scenarios with a burst altitude below the surface (i.e., peak energy deposition per unit height is not reached before the asteroid strikes the ground) will form a sizable impact crater on the ground and can be considered as a <strong>cratering event</strong> (although a sizable proportion of the original kinetic energy of the asteroid may be transferred to the air).</p>
+<p>Between these scenarios is a complex regime where a <strong>low altitude airburst combined with a substantial crater-forming event</strong> is likely. This regime is not well understood.</p>
+</div>
+</div>
+</div>
+<div class="section" id="analytical-solution">
+<h1>Analytical Solution<a class="headerlink" href="#analytical-solution" title="Permalink to this headline">¶</a></h1>
+<p>Assuming no ablation, gravity and lift, and a flat earth,
+the resulting simplifyed system of ODEs can be solved exactly</p>
+<div class="math notranslate nohighlight" id="equation-simple-de">
+<span class="eqno">(4)<a class="headerlink" href="#equation-simple-de" title="Permalink to this equation">¶</a></span>\[\frac{dv}{dt}  = \frac{-C_D\rho_a A v^2}{2 m} = \frac{-C_D\rho_0 A}{2 m}e^{-z/H}v^2\]</div>
+<div class="math notranslate nohighlight" id="equation-index-3">
+<span class="eqno">(5)<a class="headerlink" href="#equation-index-3" title="Permalink to this equation">¶</a></span>\[\frac{dz}{dt}  = -v\sin\theta\]</div>
+<div class="math notranslate nohighlight" id="equation-index-4">
+<span class="eqno">(6)<a class="headerlink" href="#equation-index-4" title="Permalink to this equation">¶</a></span>\[\frac{dx}{dt} = v\cos\theta\]</div>
+<p>By the chain rule</p>
+<div class="math notranslate nohighlight" id="equation-index-5">
+<span class="eqno">(7)<a class="headerlink" href="#equation-index-5" title="Permalink to this equation">¶</a></span>\[\frac{dv}{dz} = \frac{dv}{dt} \cdot \frac{dt}{dz} = \left[\frac{-C_D\rho_0 A}{2 m}e^{-z/H}v^2 \right] \cdot \frac{1}{-v\sin\theta}\]</div>
+<p>Rearranging we get</p>
+<div class="math notranslate nohighlight" id="equation-index-6">
+<span class="eqno">(8)<a class="headerlink" href="#equation-index-6" title="Permalink to this equation">¶</a></span>\[\frac{dv}{v}  = \frac{C_D\rho_0 A}{2 m\sin\theta}\,e^{-z/H} dz\]</div>
+<p>Integrating both sides to obtain the solution (writing log for the natural log throughout):</p>
+<div class="math notranslate nohighlight" id="equation-index-7">
+<span class="eqno">(9)<a class="headerlink" href="#equation-index-7" title="Permalink to this equation">¶</a></span>\[\log(v) + C  = \frac{-H C_D\rho_0 A}{2 m\sin\theta}e^{-z/H}\]</div>
+<p>For clarity let’s define the constant</p>
+<div class="math notranslate nohighlight" id="equation-index-8">
+<span class="eqno">(10)<a class="headerlink" href="#equation-index-8" title="Permalink to this equation">¶</a></span>\[\beta  = \frac{-H C_D\rho_0 A}{2 m\sin\theta}\]</div>
+<p>Then initial condition when <span class="math notranslate nohighlight">\(z = z_0, v = v_0 \implies
+C =  \beta e^{-z_0/H}-\log(v_0)\)</span>, so our solution is</p>
+<div class="math notranslate nohighlight" id="equation-index-9">
+<span class="eqno">(11)<a class="headerlink" href="#equation-index-9" title="Permalink to this equation">¶</a></span>\[v   = \exp\left(\beta e^{-z/H}-C\right)\]</div>
+</div>
+<div class="section" id="module-armageddon">
+<span id="function-api"></span><h1>Function API<a class="headerlink" href="#module-armageddon" title="Permalink to this headline">¶</a></h1>
+<p>Python asteroid airburst calculator</p>
+<dl class="class">
+<dt id="armageddon.Planet">
+<em class="property">class </em><code class="sig-prename descclassname">armageddon.</code><code class="sig-name descname">Planet</code><span class="sig-paren">(</span><em class="sig-param">atmos_func='exponential'</em>, <em class="sig-param">atmos_filename=None</em>, <em class="sig-param">Cd=1.0</em>, <em class="sig-param">Ch=0.1</em>, <em class="sig-param">Q=10000000.0</em>, <em class="sig-param">Cl=0.001</em>, <em class="sig-param">alpha=0.3</em>, <em class="sig-param">Rp=6371000.0</em>, <em class="sig-param">g=9.81</em>, <em class="sig-param">H=8000.0</em>, <em class="sig-param">rho0=1.2</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet" title="Permalink to this definition">¶</a></dt>
+<dd><p>The class called Planet is initialised with constants appropriate
+for the given target planet, including the atmospheric density profile
+and other constants</p>
+<p>Set up the initial parameters and constants for the target planet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>atmos_func</strong> (<em>string</em><em>, </em><em>optional</em>) – Function which computes atmospheric density, rho, at altitude, z.
+Default is the exponential function <code class="docutils literal notranslate"><span class="pre">rho</span> <span class="pre">=</span> <span class="pre">rho0</span> <span class="pre">exp(-z/H)</span></code>.
+Options are <code class="docutils literal notranslate"><span class="pre">exponential</span></code>, <code class="docutils literal notranslate"><span class="pre">tabular</span></code>, <code class="docutils literal notranslate"><span class="pre">constant</span></code> and <code class="docutils literal notranslate"><span class="pre">mars</span></code></p></li>
+<li><p><strong>atmos_filename</strong> (<em>string</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">atmos_func</span></code> = <code class="docutils literal notranslate"><span class="pre">'tabular'</span></code>, then set the filename of the table
+to be read in here.</p></li>
+<li><p><strong>Cd</strong> (<em>float</em><em>, </em><em>optional</em>) – The drag coefficient</p></li>
+<li><p><strong>Ch</strong> (<em>float</em><em>, </em><em>optional</em>) – The heat transfer coefficient</p></li>
+<li><p><strong>Q</strong> (<em>float</em><em>, </em><em>optional</em>) – The heat of ablation (J/kg)</p></li>
+<li><p><strong>Cl</strong> (<em>float</em><em>, </em><em>optional</em>) – Lift coefficient</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – Dispersion coefficient</p></li>
+<li><p><strong>Rp</strong> (<em>float</em><em>, </em><em>optional</em>) – Planet radius (m)</p></li>
+<li><p><strong>rho0</strong> (<em>float</em><em>, </em><em>optional</em>) – Air density at zero altitude (kg/m^3)</p></li>
+<li><p><strong>g</strong> (<em>float</em><em>, </em><em>optional</em>) – Surface gravity (m/s^2)</p></li>
+<li><p><strong>H</strong> (<em>float</em><em>, </em><em>optional</em>) – Atmospheric scale height (m)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="armageddon.Planet.RK_45">
+<code class="sig-name descname">RK_45</code><span class="sig-paren">(</span><em class="sig-param">f</em>, <em class="sig-param">initial_state</em>, <em class="sig-param">strength</em>, <em class="sig-param">density</em>, <em class="sig-param">t0=0.0</em>, <em class="sig-param">t_max=2000</em>, <em class="sig-param">dt=0.05</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.RK_45" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return velocity, mass, angle, altitude, distance, radius (in order) calculation for each time step using Runge_Kutta 4th order
+Please note this function will consider burst effect in dr/dt calculation
+:param f: composite of derivative function of velocity, mass, angle, altitude, distance, radius (in order)
+:type f: function
+:param initial state: composite of initial condition of velocity, mass, angle, altitude, distance, radius (in order)
+:type initial state: array or list
+:param t0 = float: initial time
+:param t_max = float: End of ODE calculation
+:param dt = float, optional: Output time step, in s</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>a Numpy array containing velocity, mass, angle, altitude, distance, radius (in order)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.analyse_outcome">
+<code class="sig-name descname">analyse_outcome</code><span class="sig-paren">(</span><em class="sig-param">result</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.analyse_outcome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inspect a prefound solution to calculate the impact and airburst stats</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>result</strong> (<em>DataFrame</em>) – pandas DataFrame with velocity, mass, angle, altitude, horizontal
+distance, radius and dedz as a function of time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>outcome</strong> – dictionary with details of airburst and/or cratering event.
+For an airburst, this will contain the following keys:
+<code class="docutils literal notranslate"><span class="pre">burst_peak_dedz</span></code>, <code class="docutils literal notranslate"><span class="pre">burst_altitude</span></code>, <code class="docutils literal notranslate"><span class="pre">burst_total_ke_lost</span></code>.</p>
+<p>For a cratering event, this will contain the following keys:
+<code class="docutils literal notranslate"><span class="pre">impact_time</span></code>, <code class="docutils literal notranslate"><span class="pre">impact_mass</span></code>, <code class="docutils literal notranslate"><span class="pre">impact_speed</span></code>.</p>
+<p>All events should also contain an entry with the key <code class="docutils literal notranslate"><span class="pre">outcome</span></code>,
+which should contain one of the following strings:
+<code class="docutils literal notranslate"><span class="pre">Airburst</span></code>, <code class="docutils literal notranslate"><span class="pre">Cratering</span></code> or <code class="docutils literal notranslate"><span class="pre">Airburst</span> <span class="pre">and</span> <span class="pre">cratering</span></code></p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.calculate_energy">
+<code class="sig-name descname">calculate_energy</code><span class="sig-paren">(</span><em class="sig-param">result</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.calculate_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to calculate the kinetic energy lost per unit altitude in
+kilotons TNT per km, for a given solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>result</strong> (<em>DataFrame</em>) – A pandas DataFrame with columns for the velocity, mass, angle,
+altitude, horizontal distance and radius as a function of time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Result</strong> – Returns the DataFrame with additional column <code class="docutils literal notranslate"><span class="pre">dedz</span></code> which is the
+kinetic energy lost per unit altitude</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.deg_to_rad">
+<code class="sig-name descname">deg_to_rad</code><span class="sig-paren">(</span><em class="sig-param">deg</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.deg_to_rad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an angle in radians
+for a given angle in degrees</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.f_com">
+<code class="sig-name descname">f_com</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">state</em>, <em class="sig-param">strength</em>, <em class="sig-param">density</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.f_com" title="Permalink to this definition">¶</a></dt>
+<dd><p>Composite of derivative function of velocity, mass, angle, altitude, distance, radius (in order)
+:param t:
+:type t: time step
+:param state: composite of current condition of velocity, mass, angle, altitude, distance, radius (in order) for every time step calculation
+:type state: array or list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>a Numpy array containing derivative result of velocity, mass, angle, altitude, distance, radius (in order)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.forward_euler">
+<code class="sig-name descname">forward_euler</code><span class="sig-paren">(</span><em class="sig-param">f</em>, <em class="sig-param">initial_state</em>, <em class="sig-param">strength</em>, <em class="sig-param">density</em>, <em class="sig-param">t0=0.0</em>, <em class="sig-param">t_max=2000</em>, <em class="sig-param">dt=0.05</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.forward_euler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward Euler time-stepper.
+u0 is the initial condition.
+t0 is the initial time; t_max is the end time.
+dt is the time step size.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.impact">
+<code class="sig-name descname">impact</code><span class="sig-paren">(</span><em class="sig-param">radius</em>, <em class="sig-param">velocity</em>, <em class="sig-param">density</em>, <em class="sig-param">strength</em>, <em class="sig-param">angle</em>, <em class="sig-param">init_altitude=100000.0</em>, <em class="sig-param">dt=0.05</em>, <em class="sig-param">radians=False</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.impact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the system of differential equations for a given impact event.
+Also calculates the kinetic energy lost per unit altitude and
+analyses the result to determine the outcome of the impact.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the asteroid in meters</p></li>
+<li><p><strong>velocity</strong> (<em>float</em>) – The entery speed of the asteroid in meters/second</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – The density of the asteroid in kg/m^3</p></li>
+<li><p><strong>strength</strong> (<em>float</em>) – The strength of the asteroid (i.e., the ram pressure above which
+fragmentation and spreading occurs) in N/m^2 (Pa)</p></li>
+<li><p><strong>angle</strong> (<em>float</em>) – The initial trajectory angle of the asteroid to the horizontal
+By default, input is in degrees. If ‘radians’ is set to True, the
+input should be in radians</p></li>
+<li><p><strong>init_altitude</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial altitude in m</p></li>
+<li><p><strong>dt</strong> (<em>float</em><em>, </em><em>optional</em>) – The output timestep, in s</p></li>
+<li><p><strong>radians</strong> (<em>logical</em><em>, </em><em>optional</em>) – Whether angles should be given in degrees or radians. Default=False
+Angles returned in the DataFrame will have the same units as the
+input</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul>
+<li><p><strong>Result</strong> (<em>DataFrame</em>) – A pandas DataFrame containing the solution to the system.
+Includes the following columns:
+<code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">mass</span></code>, <code class="docutils literal notranslate"><span class="pre">angle</span></code>, <code class="docutils literal notranslate"><span class="pre">altitude</span></code>,
+<code class="docutils literal notranslate"><span class="pre">distance</span></code>, <code class="docutils literal notranslate"><span class="pre">radius</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">dedz</span></code></p></li>
+<li><p><strong>outcome</strong> (<em>Dict</em>) – dictionary with details of airburst and/or cratering event.
+For an airburst, this will contain the following keys:
+<code class="docutils literal notranslate"><span class="pre">burst_peak_dedz</span></code>, <code class="docutils literal notranslate"><span class="pre">burst_altitude</span></code>, <code class="docutils literal notranslate"><span class="pre">burst_total_ke_lost</span></code>.</p>
+<p>For a cratering event, this will contain the following keys:
+<code class="docutils literal notranslate"><span class="pre">impact_time</span></code>, <code class="docutils literal notranslate"><span class="pre">impact_mass</span></code>, <code class="docutils literal notranslate"><span class="pre">impact_speed</span></code>.</p>
+<p>All events should also contain an entry with the key <code class="docutils literal notranslate"><span class="pre">outcome</span></code>,
+which should contain one of the following strings:
+<code class="docutils literal notranslate"><span class="pre">Airburst</span></code>, <code class="docutils literal notranslate"><span class="pre">Cratering</span></code> or <code class="docutils literal notranslate"><span class="pre">Airburst</span> <span class="pre">and</span> <span class="pre">cratering</span></code></p>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.rad_to_degrees">
+<code class="sig-name descname">rad_to_degrees</code><span class="sig-paren">(</span><em class="sig-param">rad</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.rad_to_degrees" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an angle in degrees
+for a given angle in radians</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.solve_analytical">
+<code class="sig-name descname">solve_analytical</code><span class="sig-paren">(</span><em class="sig-param">radius</em>, <em class="sig-param">velocity</em>, <em class="sig-param">density</em>, <em class="sig-param">strength</em>, <em class="sig-param">angle</em>, <em class="sig-param">init_altitude=100000.0</em>, <em class="sig-param">n=100</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.solve_analytical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides analytical solutions to the ODEs in simplified scenario</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the asteroid in meters</p></li>
+<li><p><strong>velocity</strong> (<em>float</em>) – The entery speed of the asteroid in meters/second</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – The density of the asteroid in kg/m^3</p></li>
+<li><p><strong>strength</strong> (<em>float</em>) – The strength of the asteroid (i.e., the ram pressure above which
+fragmentation and spreading occurs) in N/m^2 (Pa)</p></li>
+<li><p><strong>angle</strong> (<em>float</em>) – The initial trajectory angle of the asteroid to the horizontal</p></li>
+<li><p><strong>init_altitude</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial altitude in m</p></li>
+<li><p><strong>n</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of data points in analytical solution to compute</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Two arrays containing analytical solution velocity, v, against height, z.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="armageddon.Planet.solve_atmospheric_entry">
+<code class="sig-name descname">solve_atmospheric_entry</code><span class="sig-paren">(</span><em class="sig-param">radius</em>, <em class="sig-param">velocity</em>, <em class="sig-param">density</em>, <em class="sig-param">strength</em>, <em class="sig-param">angle</em>, <em class="sig-param">method='FE'</em>, <em class="sig-param">init_altitude=100000.0</em>, <em class="sig-param">dt=0.05</em>, <em class="sig-param">radians=False</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.Planet.solve_atmospheric_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the system of differential equations for a given impact scenario</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the asteroid in meters</p></li>
+<li><p><strong>velocity</strong> (<em>float</em>) – The entery speed of the asteroid in meters/second</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – The density of the asteroid in kg/m^3</p></li>
+<li><p><strong>strength</strong> (<em>float</em>) – The strength of the asteroid (i.e., the ram pressure above which
+fragmentation and spreading occurs) in N/m^2 (Pa)</p></li>
+<li><p><strong>angle</strong> (<em>float</em>) – The initial trajectory angle of the asteroid to the horizontal
+By default, input is in degrees. If ‘radians’ is set to True, the
+input should be in radians</p></li>
+<li><p><strong>method</strong> (<em>Runge Kutta 4th Order</em><em> (</em><em>'RK45'</em><em>) or </em><em>Forward Euler</em><em> (</em><em>'FE'</em><em>)</em>) – </p></li>
+<li><p><strong>init_altitude</strong> (<em>float</em><em>, </em><em>optional</em>) – Initial altitude in m</p></li>
+<li><p><strong>dt</strong> (<em>float</em><em>, </em><em>optional</em>) – The output timestep, in s</p></li>
+<li><p><strong>radians</strong> (<em>logical</em><em>, </em><em>optional</em>) – Whether angles should be given in degrees or radians. Default=False
+Angles returned in the DataFrame will have the same units as the
+input</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Result</strong> – A pandas DataFrame containing the solution to the system.
+Includes the following columns:
+<code class="docutils literal notranslate"><span class="pre">velocity</span></code>, <code class="docutils literal notranslate"><span class="pre">mass</span></code>, <code class="docutils literal notranslate"><span class="pre">angle</span></code>, <code class="docutils literal notranslate"><span class="pre">altitude</span></code>,
+<code class="docutils literal notranslate"><span class="pre">distance</span></code>, <code class="docutils literal notranslate"><span class="pre">radius</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="armageddon.solve_ensemble">
+<code class="sig-prename descclassname">armageddon.</code><code class="sig-name descname">solve_ensemble</code><span class="sig-paren">(</span><em class="sig-param">planet</em>, <em class="sig-param">fiducial_impact</em>, <em class="sig-param">variables</em>, <em class="sig-param">radians=False</em>, <em class="sig-param">rmin=8</em>, <em class="sig-param">rmax=12</em><span class="sig-paren">)</span><a class="headerlink" href="#armageddon.solve_ensemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run asteroid simulation for a distribution of initial conditions and
+find the burst distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>planet</strong> (<em>object</em>) – The Planet class instance on which to perform the ensemble calculation</p></li>
+<li><p><strong>fiducial_impact</strong> (<em>dict</em>) – Dictionary of the fiducial values of radius, angle, strength, velocity
+and density</p></li>
+<li><p><strong>variables</strong> (<em>list</em>) – List of strings of all impact parameters to be varied in the ensemble
+calculation</p></li>
+<li><p><strong>rmin</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum radius, in m, to use in the ensemble calculation,
+if radius is one of the parameters to be varied.</p></li>
+<li><p><strong>rmax</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum radius, in m, to use in the ensemble calculation,
+if radius is one of the parameters to be varied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ensemble</strong> – DataFrame with columns of any parameters that are varied and the
+airburst altitude</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">Armageddon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
