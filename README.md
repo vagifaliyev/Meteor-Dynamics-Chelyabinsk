@@ -41,7 +41,7 @@ There are two ways to determine all the desired outputs, which are using :
 ```
 import armageddon
 
-# We first create a Planet class called "earth", 
+# first create a Planet class called "earth", 
 # which contains all the constants, atmospheric density functions, etc.
 earth = armageddon.Planet()
 
@@ -61,12 +61,11 @@ earth.plot_analysis(result)
 
 
 #### Ensemble
-#### what is the output :
+#### Output :
+
 1. User can vary the parameters e.g radius, angle, strenght, velocity and mass according to the calculated probability distribution by solver and return burst altitude with varied parameters
 
 To get desired result, you have to specify radius, angle, strength, velocity, and density with random distribution. and the result will be in pandas data frame containing all the inputs with additional one column for burst altitude.
-
-
 
 ### Documentation
 
